@@ -1,41 +1,44 @@
-// 4 Channel Transmitter
+// 6 頻道發射器
 
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
 
-const uint64_t pipeOut = 0xE9E8F0F0E1LL;   //IMPORTANT: The same as in the receiver 0xE9E8F0F0E1LL
-RF24 radio(9, 10); // select CE,CSN pin
+const uint64_t pipeOut = 0xABCDEFABCDEF;   //必與接收器設定相同 0xE9E8F0F0E1LL
+RF24 radio(9, 10); // 設定 CE,CSN pin
 
 struct Signal {
-byte throttle;
-byte pitch;
-byte roll;
-byte yaw;
+byte Signal_A0;
+byte Signal_A1;
+byte Signal_A2;
+byte Signal_A3;
+byte Signal_A4;
+byte Signal_A5;
 };
 
 Signal data;
 
 void ResetData() 
 {
-data.throttle = 127; // Motor Stop (254/2=127)(Signal lost position)
-data.pitch = 127; // Center (Signal lost position)
-data.roll = 127; // Center (Signal lost position)
-data.yaw = 127; // Center (Signal lost position)
+// 可變電阻中間位置(254/2=127)(預設失去訊號的位置)
+data.Signal_A0 = 200;
+data.Signal_A1 = 35;
+data.Signal_A2 = 20;
+data.Signal_A3 = 220;
+data.Signal_A4 = 127;
+data.Signal_A5 = 127;
 }
 
 void setup()
 {
-//Start everything up
-
+//啟動 NRF24 模組
 radio.begin();
 radio.openWritingPipe(pipeOut);
-radio.stopListening(); //start the radio comunication for Transmitter
+radio.stopListening(); //啟動無線連接，只發射訊號
 ResetData();
 }
 
-// Joystick center and its borders
-
+// 搖桿中心及其邊界
 int mapJoystickValues(int val, int lower, int middle, int upper, bool reverse)
 {
 val = constrain(val, lower, upper);
@@ -48,14 +51,14 @@ return ( reverse ? 255 - val : val );
 
 void loop()
 {
-// Control Stick Calibration
-// Setting may be required for the correct values of the control levers.
-
-//data.throttle = mapJoystickValues( analogRead(A0), 524, 524, 1015, true );
-data.throttle = mapJoystickValues( analogRead(A0), 12, 524, 1020, false );
-data.roll = mapJoystickValues( analogRead(A1), 12, 524, 1020, false );      // "true" or "false" for servo direction
-data.pitch = mapJoystickValues( analogRead(A2), 12, 524, 1020, true );     // "true" or "false" for servo direction
-data.yaw = mapJoystickValues( analogRead(A3), 12, 524, 1020, false );       // "true" or "false" for servo direction
+//可變電阻校準
+//伺服方向為 "true" 或 "false"
+data.Signal_A0 = mapJoystickValues( analogRead(A0), 12, 524, 1020, false );
+data.Signal_A2 = mapJoystickValues( analogRead(A1), 12, 524, 1020, false );
+data.Signal_A1 = mapJoystickValues( analogRead(A2), 12, 524, 1020, true );
+data.Signal_A3 = mapJoystickValues( analogRead(A3), 12, 524, 1020, false );
+data.Signal_A4 = mapJoystickValues( analogRead(A4), 12, 524, 1020, true );
+data.Signal_A5 = mapJoystickValues( analogRead(A5), 12, 524, 1020, true );
 
 radio.write(&data, sizeof(Signal));
 }

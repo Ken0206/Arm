@@ -7,7 +7,7 @@
 #include <Servo.h>
 
 int AngleIncrement = 1;
-int DelayTime = 2;
+int DelayTime = 1;
 
 int ch_width_1 = 0;
 int ch_width_2 = 0;
@@ -20,8 +20,8 @@ int ch_width_1_ = 2068;
 int ch_width_2_ = 774;
 int ch_width_3_ = 656;
 int ch_width_4_ = 2225;
-int ch_width_5_ = 1323;
-int ch_width_6_ = 1323;
+int ch_width_5_ = 900;
+int ch_width_6_ = 1990;
 
 Servo ch1;
 Servo ch2;
@@ -41,19 +41,19 @@ byte Signal_A5;
 
 Signal data;
 
-const uint64_t pipeIn = 0xABCDEFABCDEF;
+const uint64_t pipeIn = 0xABCDEFABCDEF;  //必與發射器設定相同
 RF24 radio(9, 10); 
 
 void ResetData()
 {
 // 定義每個數據輸入的初始值
 // 可變電阻中間位置 (254/2=127)
-data.Signal_A0 = 200;
-data.Signal_A1 = 35;
-data.Signal_A2 = 20;
-data.Signal_A3 = 220;
-data.Signal_A4 = 127;
-data.Signal_A5 = 127;
+data.Signal_A0 = 255;
+data.Signal_A1 = 0;
+data.Signal_A2 = 0;
+data.Signal_A3 = 255;
+data.Signal_A4 = 0;
+data.Signal_A5 = 255;
 }
 
 void setup()
@@ -71,7 +71,7 @@ void setup()
   radio.begin();
   radio.openReadingPipe(1,pipeIn);
   radio.startListening(); ////啟動無線連接，只接收訊號
-  //Serial.begin(9600);
+  //Serial.begin(115200);
 }
 
 unsigned long lastRecvTime = 0;
@@ -92,12 +92,12 @@ if ( now - lastRecvTime > 1000 ) {
 ResetData(); // 失去訊號，重設資料
 }
 
-ch_width_1 = map(data.Signal_A0, 0, 255, 500, 2500);     // pin D2 (PWM 訊號)
-ch_width_2 = map(data.Signal_A1, 0, 255, 500, 2500);     // pin D3 (PWM 訊號)
-ch_width_3 = map(data.Signal_A2, 0, 255, 500, 2500);     // pin D4 (PWM 訊號)
-ch_width_4 = map(data.Signal_A3, 0, 255, 500, 2500);     // pin D5 (PWM 訊號)
-ch_width_5 = map(data.Signal_A4, 0, 255, 500, 2500);     // pin D6 (PWM 訊號)
-ch_width_6 = map(data.Signal_A5, 0, 255, 500, 2500);     // pin D7 (PWM 訊號)
+ch_width_1 = map(data.Signal_A0, 0, 255, 954, 2068);     // pin D2 (PWM 訊號)
+ch_width_2 = map(data.Signal_A1, 0, 255, 774, 1864);     // pin D3 (PWM 訊號)
+ch_width_3 = map(data.Signal_A2, 0, 255, 656, 1723);     // pin D4 (PWM 訊號)
+ch_width_4 = map(data.Signal_A3, 0, 255, 1143, 2178);     // pin D5 (PWM 訊號)
+ch_width_5 = map(data.Signal_A4, 0, 255, 900, 2500);     // pin D6 (PWM 訊號)
+ch_width_6 = map(data.Signal_A5, 0, 255, 500, 1990);     // pin D7 (PWM 訊號)
 
 if (ch_width_1 > ch_width_1_){
   ch_width_1_ = ch_width_1_ + AngleIncrement;
@@ -136,7 +136,7 @@ if (ch_width_6 > ch_width_6_){
 if (ch_width_6 < ch_width_6_){
   ch_width_6_ = ch_width_6_ - AngleIncrement;
   }
-  
+
 /*
 Serial.print(ch_width_1_);
 Serial.print("  ");

@@ -4,7 +4,7 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 
-const uint64_t pipeOut = 0xABCDEFABCDEF;   //必與接收器設定相同 0xE9E8F0F0E1LL
+const uint64_t pipeOut = 0xABCDEFABCDEF;   //必與接收器設定相同
 RF24 radio(9, 10); // 設定 CE,CSN pin
 
 struct Signal {
@@ -21,12 +21,12 @@ Signal data;
 void ResetData() 
 {
 // 可變電阻中間位置(254/2=127)(預設失去訊號的位置)
-data.Signal_A0 = 200;
-data.Signal_A1 = 35;
-data.Signal_A2 = 20;
-data.Signal_A3 = 220;
-data.Signal_A4 = 127;
-data.Signal_A5 = 127;
+data.Signal_A0 = 255;
+data.Signal_A1 = 0;
+data.Signal_A2 = 0;
+data.Signal_A3 = 255;
+data.Signal_A4 = 0;
+data.Signal_A5 = 255;
 }
 
 void setup()
@@ -54,8 +54,8 @@ void loop()
 //可變電阻校準
 //伺服方向為 "true" 或 "false"
 data.Signal_A0 = mapJoystickValues( analogRead(A0), 12, 524, 1020, false );
-data.Signal_A2 = mapJoystickValues( analogRead(A1), 12, 524, 1020, false );
-data.Signal_A1 = mapJoystickValues( analogRead(A2), 12, 524, 1020, true );
+data.Signal_A1 = mapJoystickValues( analogRead(A1), 12, 524, 1020, false );
+data.Signal_A2 = mapJoystickValues( analogRead(A2), 12, 524, 1020, false );
 data.Signal_A3 = mapJoystickValues( analogRead(A3), 12, 524, 1020, false );
 data.Signal_A4 = mapJoystickValues( analogRead(A4), 12, 524, 1020, true );
 data.Signal_A5 = mapJoystickValues( analogRead(A5), 12, 524, 1020, true );

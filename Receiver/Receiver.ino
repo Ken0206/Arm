@@ -48,12 +48,12 @@ void ResetData()
 {
 // 定義每個數據輸入的初始值
 // 可變電阻中間位置 (254/2=127)
-data.Signal_A0 = 255;
-data.Signal_A1 = 0;
-data.Signal_A2 = 0;
-data.Signal_A3 = 255;
-data.Signal_A4 = 0;
-data.Signal_A5 = 255;
+data.Signal_A0 = 242;
+data.Signal_A1 = 7;
+data.Signal_A2 = 204;
+data.Signal_A3 = 183;
+data.Signal_A4 = 110;
+data.Signal_A5 = 248;
 }
 
 void setup()
@@ -92,13 +92,32 @@ if ( now - lastRecvTime > 1000 ) {
 ResetData(); // 失去訊號，重設資料
 }
 
-ch_width_1 = map(data.Signal_A0, 0, 255, 954, 2068);     // pin D2 (PWM 訊號)
-ch_width_2 = map(data.Signal_A1, 0, 255, 774, 1864);     // pin D3 (PWM 訊號)
-ch_width_3 = map(data.Signal_A2, 0, 255, 656, 1723);     // pin D4 (PWM 訊號)
-ch_width_4 = map(data.Signal_A3, 0, 255, 1143, 2178);     // pin D5 (PWM 訊號)
-ch_width_5 = map(data.Signal_A4, 0, 255, 900, 2500);     // pin D6 (PWM 訊號)
-ch_width_6 = map(data.Signal_A5, 0, 255, 500, 1990);     // pin D7 (PWM 訊號)
+/*
+Serial.print(data.Signal_A0);
+Serial.print("  ");
+Serial.print(data.Signal_A1);
+Serial.print("  ");
+Serial.print(data.Signal_A2);
+Serial.print("  ");
+Serial.print(data.Signal_A3);
+Serial.print("  ");
+Serial.print(data.Signal_A4);
+Serial.print("  ");
+Serial.println(data.Signal_A5);
+*/
 
+//動作範圍
+ch_width_1 = map(data.Signal_A0, 119, 242, 1200, 2068);     // pin D2 (PWM 訊號) 2068
+ch_width_2 = map(data.Signal_A1, 7, 136, 774, 1650);     // pin D3 (PWM 訊號) 774
+ch_width_3 = map(data.Signal_A2, 205, 255, 656, 1360);     // pin D4 (PWM 訊號) 656
+ch_width_4 = map(data.Signal_A3, 4, 194, 1300, 2225);     // pin D5 (PWM 訊號) 2225
+ch_width_5 = map(data.Signal_A4, 137, 255, 900, 1500);     // pin D6 (PWM 訊號) 900
+ch_width_6 = map(data.Signal_A5, 61, 241, 1400, 1990);     // pin D7 (PWM 訊號) 1990
+
+//零點  242  7  205  194  137  241
+//外點  119  136  255  4  255  61
+
+//漸變
 if (ch_width_1 > ch_width_1_){
   ch_width_1_ = ch_width_1_ + AngleIncrement;
   }
@@ -135,6 +154,47 @@ if (ch_width_6 > ch_width_6_){
   }
 if (ch_width_6 < ch_width_6_){
   ch_width_6_ = ch_width_6_ - AngleIncrement;
+  }
+
+
+//原點極限值
+if (ch_width_1_ > 2068){
+  ch_width_1_ = 2068;
+  }
+if (ch_width_2_ > 1650){
+  ch_width_2_ = 1650;
+  }
+if (ch_width_3_ > 1360){
+  ch_width_3_ = 1360;
+  }
+if (ch_width_4_ > 2255){
+  ch_width_4_ = 2255;
+  }
+if (ch_width_5_ < 900){
+  ch_width_5_ = 900;
+  }
+if (ch_width_6_ > 1990){
+  ch_width_6_ = 1990;
+  }
+
+//外點極限值
+if (ch_width_1_ < 1200){
+  ch_width_1_ = 1200;
+  }
+if (ch_width_2_ < 774){
+  ch_width_2_ = 774;
+  }
+if (ch_width_3_ < 656){
+  ch_width_3_ = 656;
+  }
+if (ch_width_4_ < 1300){
+  ch_width_4_ = 1300;
+  }
+if (ch_width_5_ > 1500){
+  ch_width_5_ = 1500;
+  }
+if (ch_width_6_ < 1400){
+  ch_width_6_ = 1400;
   }
 
 /*

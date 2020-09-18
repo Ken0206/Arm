@@ -7,7 +7,30 @@
 #include <Servo.h>
 
 int AngleIncrement = 1;
-int DelayTime = 1;
+int DelayTime = 20;
+
+//機械原點 PWM 值
+int init_1 = 2006;
+int init_2 = 822;
+int init_3 = 705;
+int init_4 = 2021;
+int init_5 = 902;
+int init_6 = 1990;
+
+//機械極限點 PWM 值
+int limit_1 = 1446;
+int limit_2 = 1568;
+int limit_3 = 1360;
+int limit_4 = 1300;
+int limit_5 = 1474;
+int limit_6 = 1400;
+
+int ch_width_1_ = init_1;
+int ch_width_2_ = init_2;
+int ch_width_3_ = init_3;
+int ch_width_4_ = init_4;
+int ch_width_5_ = init_5;
+int ch_width_6_ = init_6;
 
 int ch_width_1 = 0;
 int ch_width_2 = 0;
@@ -15,13 +38,6 @@ int ch_width_3 = 0;
 int ch_width_4 = 0;
 int ch_width_5 = 0;
 int ch_width_6 = 0;
-
-int ch_width_1_ = 2068;
-int ch_width_2_ = 774;
-int ch_width_3_ = 656;
-int ch_width_4_ = 2225;
-int ch_width_5_ = 900;
-int ch_width_6_ = 1990;
 
 Servo ch1;
 Servo ch2;
@@ -48,12 +64,12 @@ void ResetData()
 {
 // 定義每個數據輸入的初始值
 // 可變電阻中間位置 (254/2=127)
-data.Signal_A0 = 242;
-data.Signal_A1 = 7;
-data.Signal_A2 = 204;
-data.Signal_A3 = 183;
-data.Signal_A4 = 110;
-data.Signal_A5 = 248;
+data.Signal_A0 = 255;
+data.Signal_A1 = 0;
+data.Signal_A2 = 0;
+data.Signal_A3 = 255;
+data.Signal_A4 = 0;
+data.Signal_A5 = 255;
 }
 
 void setup()
@@ -86,6 +102,8 @@ lastRecvTime = millis();   // 接收資料
 
 void loop()
 {
+delay(DelayTime);
+//delayMicroseconds(DelayTime);
 recvData();
 unsigned long now = millis();
 if ( now - lastRecvTime > 1000 ) {
@@ -106,18 +124,15 @@ Serial.print("  ");
 Serial.println(data.Signal_A5);
 */
 
-//動作範圍
-ch_width_1 = map(data.Signal_A0, 119, 242, 1200, 2068);     // pin D2 (PWM 訊號) 2068
-ch_width_2 = map(data.Signal_A1, 7, 136, 774, 1650);     // pin D3 (PWM 訊號) 774
-ch_width_3 = map(data.Signal_A2, 205, 255, 656, 1360);     // pin D4 (PWM 訊號) 656
-ch_width_4 = map(data.Signal_A3, 4, 194, 1300, 2225);     // pin D5 (PWM 訊號) 2225
-ch_width_5 = map(data.Signal_A4, 137, 255, 900, 1500);     // pin D6 (PWM 訊號) 900
-ch_width_6 = map(data.Signal_A5, 61, 241, 1400, 1990);     // pin D7 (PWM 訊號) 1990
+//動作範圍對應
+ch_width_1 = map(data.Signal_A0, 0, 255, limit_1, init_1);     // pin D2 (PWM 訊號)
+ch_width_2 = map(data.Signal_A1, 0, 255, init_2, limit_2);     // pin D3 (PWM 訊號)
+ch_width_3 = map(data.Signal_A2, 0, 255, init_3, limit_3);     // pin D4 (PWM 訊號)
+ch_width_4 = map(data.Signal_A3, 0, 255, limit_4, init_4);     // pin D5 (PWM 訊號)
+ch_width_5 = map(data.Signal_A4, 0, 255, init_5, limit_5);     // pin D6 (PWM 訊號)
+ch_width_6 = map(data.Signal_A5, 0, 255, limit_6, init_6);     // pin D7 (PWM 訊號)
 
-//零點  242  7  205  194  137  241
-//外點  119  136  255  4  255  61
-
-//漸變
+// PWM 訊號漸變
 if (ch_width_1 > ch_width_1_){
   ch_width_1_ = ch_width_1_ + AngleIncrement;
   }
@@ -142,7 +157,6 @@ if (ch_width_4 > ch_width_4_){
 if (ch_width_4 < ch_width_4_){
   ch_width_4_ = ch_width_4_ - AngleIncrement;
   }
-
 if (ch_width_5 > ch_width_5_){
   ch_width_5_ = ch_width_5_ + AngleIncrement;
   }
@@ -156,45 +170,44 @@ if (ch_width_6 < ch_width_6_){
   ch_width_6_ = ch_width_6_ - AngleIncrement;
   }
 
+//機械原點限制 PWM 值
+if (ch_width_1_ > init_1){
+  ch_width_1_ = init_1;
+  }
+if (ch_width_2_ < init_2){
+  ch_width_2_ = init_2;
+  }
+if (ch_width_3_ < init_3){
+  ch_width_3_ = init_3;
+  }
+if (ch_width_4_ > init_4){
+  ch_width_4_ = init_4;
+  }
+if (ch_width_5_ < init_5){
+  ch_width_5_ = init_5;
+  }
+if (ch_width_6_ > init_6){
+  ch_width_6_ = init_6;
+  }
 
-//原點極限值
-if (ch_width_1_ > 2068){
-  ch_width_1_ = 2068;
+//機械極限點限制 PWM 值
+if (ch_width_1_ < limit_1){
+  ch_width_1_ = limit_1;
   }
-if (ch_width_2_ > 1650){
-  ch_width_2_ = 1650;
+if (ch_width_2_ > limit_2){
+  ch_width_2_ = limit_2;
   }
-if (ch_width_3_ > 1360){
-  ch_width_3_ = 1360;
+if (ch_width_3_ > limit_3){
+  ch_width_3_ = limit_3;
   }
-if (ch_width_4_ > 2255){
-  ch_width_4_ = 2255;
+if (ch_width_4_ < limit_4){
+  ch_width_4_ = limit_4;
   }
-if (ch_width_5_ < 900){
-  ch_width_5_ = 900;
+if (ch_width_5_ > limit_5){
+  ch_width_5_ = limit_5;
   }
-if (ch_width_6_ > 1990){
-  ch_width_6_ = 1990;
-  }
-
-//外點極限值
-if (ch_width_1_ < 1200){
-  ch_width_1_ = 1200;
-  }
-if (ch_width_2_ < 774){
-  ch_width_2_ = 774;
-  }
-if (ch_width_3_ < 656){
-  ch_width_3_ = 656;
-  }
-if (ch_width_4_ < 1300){
-  ch_width_4_ = 1300;
-  }
-if (ch_width_5_ > 1500){
-  ch_width_5_ = 1500;
-  }
-if (ch_width_6_ < 1400){
-  ch_width_6_ = 1400;
+if (ch_width_6_ < limit_6){
+  ch_width_6_ = limit_6;
   }
 
 /*
@@ -219,5 +232,4 @@ ch4.writeMicroseconds(ch_width_4_);
 ch5.writeMicroseconds(ch_width_5_);
 ch6.writeMicroseconds(ch_width_6_);
 
-delay(DelayTime);
 }

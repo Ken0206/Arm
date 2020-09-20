@@ -7,7 +7,8 @@
 #include <Servo.h>
 
 int AngleIncrement = 1;
-int DelayTime = 10;
+int DelayTime;
+//int DelayTime = 3;
 
 //機械原點 PWM 值
 int init_1 = 1984;
@@ -102,6 +103,7 @@ lastRecvTime = millis();   // 接收資料
 
 void loop()
 {
+  int DelayTime = analogRead(0) / 100;
 delay(DelayTime);
 //delayMicroseconds(DelayTime);
 recvData();

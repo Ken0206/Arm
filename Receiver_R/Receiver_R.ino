@@ -7,24 +7,22 @@
 #include <Servo.h>
 
 int AngleIncrement = 1;
-int DelayTime;
-//int DelayTime = 3;
 
 //機械原點 PWM 值
-int init_1 = 1984;
-int init_2 = 845;
-int init_3 = 705;
-int init_4 = 2021;
-int init_5 = 924;
-int init_6 = 1918;
+int init_1 = 1700;
+int init_2 = 900;
+int init_3 = 700;
+int init_4 = 2140;
+int init_5 = 902;
+int init_6 = 1990;
 
 //機械極限點 PWM 值
-int limit_1 = 1446;
-int limit_2 = 1568;
-int limit_3 = 1360;
-int limit_4 = 1300;
-int limit_5 = 1800;
-int limit_6 = 1150;
+int limit_1 = 600;
+int limit_2 = 2350;
+int limit_3 = 2400;
+int limit_4 = 500;
+int limit_5 = 2100;
+int limit_6 = 800;
 
 int ch_width_1_ = init_1;
 int ch_width_2_ = init_2;
@@ -65,12 +63,12 @@ void ResetData()
 {
 // 定義每個數據輸入的初始值
 // 可變電阻中間位置 (254/2=127)
-data.Signal_A0 = 244;
-data.Signal_A1 = 8;
+data.Signal_A0 = 255;
+data.Signal_A1 = 0;
 data.Signal_A2 = 0;
 data.Signal_A3 = 255;
-data.Signal_A4 = 10;
-data.Signal_A5 = 123;
+data.Signal_A4 = 0;
+data.Signal_A5 = 255;
 }
 
 void setup()
@@ -103,9 +101,7 @@ lastRecvTime = millis();   // 接收資料
 
 void loop()
 {
-  int DelayTime = analogRead(0) / 100;
-delay(DelayTime);
-//delayMicroseconds(DelayTime);
+delayMicroseconds( map ( analogRead(0) , 0 , 1023 , 0 , 5000 ) );
 recvData();
 unsigned long now = millis();
 if ( now - lastRecvTime > 1000 ) {
@@ -127,12 +123,12 @@ Serial.println(data.Signal_A5);
 */
 
 //動作範圍對應
-ch_width_1 = map(data.Signal_A0, 123, 246, limit_1, init_1);     // pin D2 (PWM 訊號)
-ch_width_2 = map(data.Signal_A1, 12, 124, init_2, limit_2);     // pin D3 (PWM 訊號)
-ch_width_3 = map(data.Signal_A2, 0, 58, init_3, limit_3);     // pin D4 (PWM 訊號)
-ch_width_4 = map(data.Signal_A3, 200, 254, limit_4, init_4);     // pin D5 (PWM 訊號)
-ch_width_5 = map(data.Signal_A4, 142, 242, init_5, limit_5);     // pin D6 (PWM 訊號)
-ch_width_6 = map(data.Signal_A5, 133, 244, limit_6, init_6);     // pin D7 (PWM 訊號)
+ch_width_1 = map(data.Signal_A0, 0, 255, limit_1, init_1);     // pin D2 (PWM 訊號)
+ch_width_2 = map(data.Signal_A1, 0, 255, init_2, limit_2);     // pin D3 (PWM 訊號)
+ch_width_3 = map(data.Signal_A2, 0, 255, init_3, limit_3);     // pin D4 (PWM 訊號)
+ch_width_4 = map(data.Signal_A3, 0, 255, limit_4, init_4);     // pin D5 (PWM 訊號)
+ch_width_5 = map(data.Signal_A4, 0, 255, init_5, limit_5);     // pin D6 (PWM 訊號)
+ch_width_6 = map(data.Signal_A5, 0, 255, limit_6, init_6);     // pin D7 (PWM 訊號)
 
 // PWM 訊號漸變
 if (ch_width_1 > ch_width_1_){
@@ -172,45 +168,13 @@ if (ch_width_6 < ch_width_6_){
   ch_width_6_ = ch_width_6_ - AngleIncrement;
   }
 
-//機械原點限制 PWM 值
-if (ch_width_1_ > init_1){
-  ch_width_1_ = init_1;
-  }
-if (ch_width_2_ < init_2){
-  ch_width_2_ = init_2;
-  }
-if (ch_width_3_ < init_3){
-  ch_width_3_ = init_3;
-  }
-if (ch_width_4_ > init_4){
-  ch_width_4_ = init_4;
-  }
-if (ch_width_5_ < init_5){
-  ch_width_5_ = init_5;
-  }
-if (ch_width_6_ > init_6){
-  ch_width_6_ = init_6;
-  }
-
-//機械極限點限制 PWM 值
-if (ch_width_1_ < limit_1){
-  ch_width_1_ = limit_1;
-  }
-if (ch_width_2_ > limit_2){
-  ch_width_2_ = limit_2;
-  }
-if (ch_width_3_ > limit_3){
-  ch_width_3_ = limit_3;
-  }
-if (ch_width_4_ < limit_4){
-  ch_width_4_ = limit_4;
-  }
-if (ch_width_5_ > limit_5){
-  ch_width_5_ = limit_5;
-  }
-if (ch_width_6_ < limit_6){
-  ch_width_6_ = limit_6;
-  }
+//機械可動範圍
+ch_width_1_ = constrain( ch_width_1_ , limit_1 , init_1 ) ;
+ch_width_2_ = constrain( ch_width_2_ , init_2 , limit_2 ) ;
+ch_width_3_ = constrain( ch_width_3_ , init_3 , limit_3 ) ;
+ch_width_4_ = constrain( ch_width_4_ , limit_4 , init_4 ) ;
+ch_width_5_ = constrain( ch_width_5_ , init_5 , limit_5 ) ;
+ch_width_6_ = constrain( ch_width_6_ , limit_6 , init_6 ) ;
 
 /*
 Serial.print(ch_width_1_);

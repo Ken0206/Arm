@@ -6,7 +6,7 @@
 #include <RF24.h>
 #include <Servo.h>
 
-int AngleIncrement = 1;
+int AngleIncrement = 5;
 
 //機械原點 PWM 值
 int init_1 = 1700;
